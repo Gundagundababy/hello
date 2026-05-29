@@ -1,0 +1,57 @@
+static nat
+ip nat inside source static local_ip global_ip
+int gig0/0
+ip nat inside
+int se0/0/0
+ip nat outside
+
+dynamic nat
+access-list 5 permit target_ip subnetmask
+ip nat inside source list 5 intereface Se0/0/0 overload
+
+Step1 License:
+R1(config)# do show version
+Note: Must have securityk9, If not present then apply below command
+R1(config)# license boot module c1900 technology-package securityk9
+Note: it will prompt to enter [yes/no]: yes
+R1(config)# do write
+R1(config)# exit
+R1# reload
+Note: Now router will restart and again re-verify the license
+R1(config)# do show version
+
+Phase I – It need to be configured based on the configuration given in the Table
+R1(config) # crypto isakmp policy 10
+R1(config-isakmp) # encryption aes 256
+R1(config-isakmp) # authentication pre-share
+R1(config-isakmp) # group 5
+R1(config-isakmp) # exit
+R1(config) # crypto isakmp key <crypto_key> address <Peer_IP> -> syntax
+R1(config) # crypto isakmp key vpnpa55 address 10.2.2.2
+
+Phase II - It need to be configured based on the configuration given in the Table
+Transform set
+R1(config)# crypto ipsec transform-set VPN-SET esp-aes esp-sha-hmac
+Crypto Map
+R1(config)# crypto map VPN-MAP 10 ipsec-isakmp
+R1(config-crypto-map)# set peer 10.2.2.2
+R1(config-crypto-map)# set transform-set VPN-SET
+R1(config-crypto-map)# match address 110
+R1(config-crypto-map)# exit
+
+R1# show ntp status
+R1# show clock detail
+R1(config)# ntp server <NTP_Server_IP>
+R1(config)# ntp server 209.165.200.225
+
+/30 | 252
+/29 | 248
+/28 | 240
+/27 | 224
+/26 | 192
+/25 | 128
+/24 | 255.0
+/23 | 254.0
+/22 | 252.0
+/21 | 248.0
+/20 | 240.0
